@@ -14,5 +14,8 @@
     "scripts": [],
     "esmodules": [
         "scripts/demiplane-import.js"
-    ]
+    ],
+	"url": "https://github.com/Seelenoede/demiplane-pf2e-foundry-importer",
+	"readme": "README.md",
+	"system": ["pf2e"]
 }
