@@ -21,9 +21,11 @@ Hooks.on("renderCharacterSheetPF2e", async function (obj, html) {
 });
 
 async function importer(targetActor) {
+    console.log("Got this actor:");
+    console.log(targetActor);
     new foundry.applications.api.DialogV2({
         window: { title: "Choose a Demiplane PDF" },
-        content: await renderTemplate("modules/demiplane-importer/templates/importDiag.html") ,
+        content: await renderTemplate("modules/demiplane-pf2e-foundry-importer/templates/importDiag.html") ,
         buttons: [{
             action: "import",
             label: "Import Character",
@@ -53,7 +55,7 @@ async function startImport(srcFile, targetActor) {
     const pdf = await pdfJs.getDocument(srcFile).promise;
 
     const fieldObjects = await pdf.getFieldObjects();
-    
+    console.log("Parsed this PDF:");
     console.log(fieldObjects);
 
     importCharacter(fieldObjects, targetActor);
@@ -65,9 +67,10 @@ async function importCharacter(pdfFields, targetActor) {
     await targetActor.update({
         name: pdfFields.character_name[0].value,
 
+        // FIXME is not read yet
         "system.abilities.str.base": pdfFields.strength[0].value,
         "system.abilities.dex.base": pdfFields.dexterity[0].value,
-        "system.abilities.con.base": pdfFields.consitution[0].value,
+        "system.abilities.con.base": pdfFields.constitution[0].value,
         "system.abilities.int.base": pdfFields.intelligence[0].value,
         "system.abilities.wis.base": pdfFields.wisdom[0].value,
         "system.abilities.cha.base": pdfFields.charisma[0].value,
@@ -108,7 +111,7 @@ async function importCharacter(pdfFields, targetActor) {
         "system.details.ethnicity.value": pdfFields.ethnicity[0].value,
         "system.details.nationality.value": pdfFields.nationality[0].value,
 
-        //"system.details.biography.appearance": pdfFields.level[0].value, has to entries
+        // "system.details.biography.appearance": pdfFields.level[0].value, has two entries
         // "system.details.biography.backstory": pdfFields.level[0].value,
         // "system.details.biography.birthplace": pdfFields.level[0].value,
         // "system.details.biography.attitude": pdfFields.level[0].value,
@@ -124,44 +127,38 @@ async function importCharacter(pdfFields, targetActor) {
         // "system.details.biography.organizations": pdfFields.level[0].value,
         // "system.details.biography.deities": pdfFields.level[0].value,
 
-        "system.traits.size.value": pdfFields.size[0].value, //probably needs mapping Medium -> med, Small -> sm...
+        "system.traits.size.value": pdfFields.size[0].value,
 
-        "system.traits.languages.value": pdfFields.languages,
-        "system.traits.senses": senses,
+        // "system.traits.languages.value": pdfFields.languages,
+        // "system.traits.senses": senses,
         
+        // "system.saves.fortitude.rank": pdfFields.proficiencies.fortitude / 2,
+        // "system.saves.reflex.rank": pdfFields.proficiencies.reflex / 2,
+        // "system.saves.will.rank": pdfFields.proficiencies.will / 2,
 
-        "system.saves.fortitude.rank": pdfFields.proficiencies.fortitude / 2,
-        "system.saves.reflex.rank": pdfFields.proficiencies.reflex / 2,
-        "system.saves.will.rank": pdfFields.proficiencies.will / 2,
-
-        "system.martial.advanced.rank": pdfFields.proficiencies.advanced / 2,
-        "system.martial.heavy.rank": pdfFields.proficiencies.heavy / 2,
-        "system.martial.light.rank": pdfFields.proficiencies.light / 2,
-        "system.martial.medium.rank": pdfFields.proficiencies.medium / 2,
-        "system.martial.unarmored.rank": pdfFields.proficiencies.unarmored / 2,
-        "system.martial.martial.rank": pdfFields.proficiencies.martial / 2,
-        "system.martial.simple.rank": pdfFields.proficiencies.simple / 2,
-        "system.martial.unarmed.rank": pdfFields.proficiencies.unarmed / 2,
-        "system.skills.acr.rank": pdfFields.proficiencies.acrobatics / 2,
-        "system.skills.arc.rank": pdfFields.proficiencies.arcana / 2,
-        "system.skills.ath.rank": pdfFields.proficiencies.athletics / 2,
-        "system.skills.cra.rank": pdfFields.proficiencies.crafting / 2,
-        "system.skills.dec.rank": pdfFields.proficiencies.deception / 2,
-        "system.skills.dip.rank": pdfFields.proficiencies.diplomacy / 2,
-        "system.skills.itm.rank": pdfFields.proficiencies.intimidation / 2,
-        "system.skills.med.rank": pdfFields.proficiencies.medicine / 2,
-        "system.skills.nat.rank": pdfFields.proficiencies.nature / 2,
-        "system.skills.occ.rank": pdfFields.proficiencies.occultism / 2,
-        "system.skills.prf.rank": pdfFields.proficiencies.performance / 2,
-        "system.skills.rel.rank": pdfFields.proficiencies.religion / 2,
-        "system.skills.soc.rank": pdfFields.proficiencies.society / 2,
-        "system.skills.ste.rank": pdfFields.proficiencies.stealth / 2,
-        "system.skills.sur.rank": pdfFields.proficiencies.survival / 2,
-        "system.skills.thi.rank": pdfFields.proficiencies.thievery / 2,
-    })
-    // pdfFields.forEach(field => {
-    //     character[field.id.Id] = field.V;
-    // });
-
-    //TODO map to Foundry data
+        // "system.martial.advanced.rank": pdfFields.proficiencies.advanced / 2,
+        // "system.martial.heavy.rank": pdfFields.proficiencies.heavy / 2,
+        // "system.martial.light.rank": pdfFields.proficiencies.light / 2,
+        // "system.martial.medium.rank": pdfFields.proficiencies.medium / 2,
+        // "system.martial.unarmored.rank": pdfFields.proficiencies.unarmored / 2,
+        // "system.martial.martial.rank": pdfFields.proficiencies.martial / 2,
+        // "system.martial.simple.rank": pdfFields.proficiencies.simple / 2,
+        // "system.martial.unarmed.rank": pdfFields.proficiencies.unarmed / 2,
+        // "system.skills.acr.rank": pdfFields.proficiencies.acrobatics / 2,
+        // "system.skills.arc.rank": pdfFields.proficiencies.arcana / 2,
+        // "system.skills.ath.rank": pdfFields.proficiencies.athletics / 2,
+        // "system.skills.cra.rank": pdfFields.proficiencies.crafting / 2,
+        // "system.skills.dec.rank": pdfFields.proficiencies.deception / 2,
+        // "system.skills.dip.rank": pdfFields.proficiencies.diplomacy / 2,
+        // "system.skills.itm.rank": pdfFields.proficiencies.intimidation / 2,
+        // "system.skills.med.rank": pdfFields.proficiencies.medicine / 2,
+        // "system.skills.nat.rank": pdfFields.proficiencies.nature / 2,
+        // "system.skills.occ.rank": pdfFields.proficiencies.occultism / 2,
+        // "system.skills.prf.rank": pdfFields.proficiencies.performance / 2,
+        // "system.skills.rel.rank": pdfFields.proficiencies.religion / 2,
+        // "system.skills.soc.rank": pdfFields.proficiencies.society / 2,
+        // "system.skills.ste.rank": pdfFields.proficiencies.stealth / 2,
+        // "system.skills.sur.rank": pdfFields.proficiencies.survival / 2,
+        // "system.skills.thi.rank": pdfFields.proficiencies.thievery / 2,
+    });
 }
